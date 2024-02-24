@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #1877f2;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: calc(100% - 22px);
+            height: 200px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: vertical;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #1877f2;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        button:hover {
+            background-color: #166fe5;
+        }
+
+        .note {
+            position: relative;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        .note .button-container {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .note button {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 5px;
+        }
+
+        .copy {
+            color: #1877f2;
+        }
+
+        .delete {
+            color: #ff0000;
+        }
+
+        .delete:hover {
+            background-color: #ffcccc;
+        }
+
+        .whatsapp {
+            color: #25D366; /* WhatsApp Green */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Notes App</h1>
+        <textarea id="noteInput" placeholder="Enter your note here..."></textarea>
+        <button onclick="saveNote()">Save Note</button>
+        <div id="noteList"></div>
+    </div>
+
+    <script>
+        // Function to save note
+        function saveNote() {
+            var noteInput = document.getElementById('noteInput');
+            var noteList = document.getElementById('noteList');
+            var noteText = noteInput.value.trim();
+
+            if (noteText !== '') {
+                var noteElement = document.createElement('div');
+                noteElement.classList.add('note');
+                noteElement.textContent = noteText;
+
+                // Create button container
+                var buttonContainer = document.createElement('div');
+                buttonContainer.classList.add('button-container');
+                
+                // Create copy button
+                var copyButton = document.createElement('button');
+                copyButton.innerHTML = '📋';
+                copyButton.classList.add('copy');
+                copyButton.onclick = function() {
+                    copyToClipboard(noteText);
+                };
+                buttonContainer.appendChild(copyButton);
+
+                // Create delete button
+                var deleteButton = document.createElement('button');
+                deleteButton.innerHTML = '❌';
+                deleteButton.classList.add('delete');
+                deleteButton.onclick = function() {
+                    noteList.removeChild(noteElement);
+                    saveToLocalStorage();
+                };
+                buttonContainer.appendChild(deleteButton);
+
+                // Create WhatsApp share button
+                var whatsappButton = document.createElement('button');
+                whatsappButton.innerHTML = 'WhatsApp';
+                whatsappButton.classList.add('whatsapp');
+                whatsappButton.onclick = function() {
+                    // Change the phone number and message content as needed
+                    var phoneNumber = ''; // Enter phone number here
+                    var message = encodeURIComponent(noteText);
+                    window.open('https://api.whatsapp.com/send?phone=' + phoneNumber + '&text=' + message);
+                };
+                buttonContainer.appendChild(whatsappButton);
+
+                noteElement.appendChild(buttonContainer);
+
+                noteList.appendChild(noteElement);
+                noteInput.value = '';
+                saveToLocalStorage();
+            } else {
+                alert('Please enter a note!');
+            }
+        }
+
+        // Function to copy text to clipboard
+        function copyToClipboard(text) {
+            var textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert('Note copied to clipboard!');
+        }
+
+        // Function to save notes to local storage
+        function saveToLocalStorage() {
+            var notes = document.querySelectorAll('.note');
+            var notesArray = Array.from(notes).map(note => note.textContent);
+            localStorage.setItem('notes', JSON.stringify(notesArray));
+        }
+
+        // Function to load notes from local storage
+        function loadFromLocalStorage() {
+            var notesArray = JSON.parse(localStorage.getItem('notes'));
+            if (notesArray) {
+                var noteList = document.getElementById('noteList');
+                notesArray.forEach(noteText => {
+                    var noteElement = document.createElement('div');
+                    noteElement.classList.add('note');
+                    noteElement.textContent = noteText;
+
+                    // Create button container
+                    var buttonContainer = document.createElement('div');
+                    buttonContainer.classList.add('button-container');
+                    
+                    // Create copy button
+                    var copyButton = document.createElement('button');
+                    copyButton.innerHTML = '📋';
+                    copyButton.classList.add('copy');
+                    copyButton.onclick = function() {
+                        copyToClipboard(noteText);
+                    };
+                    buttonContainer.appendChild(copyButton);
+
+                    // Create delete button
+                    var deleteButton = document.createElement('button');
+                    deleteButton.innerHTML = '❌';
+                    deleteButton.classList.add('delete');
+                    deleteButton.onclick = function() {
+                        noteList.removeChild(noteElement);
+                        saveToLocalStorage();
+                    };
+                    buttonContainer.appendChild(deleteButton);
+
+                    // Create WhatsApp share button
+                    var whatsappButton = document.createElement('button');
+                    whatsappButton.innerHTML = 'WhatsApp';
+                    whatsappButton.classList.add('whatsapp');
+                    whatsappButton.onclick = function() {
+                        // Change the phone number and message content as needed
+                        var phoneNumber = ''; // Enter phone number here
+                        var message = encodeURIComponent(noteText);
+                        window.open('https://api.whatsapp.com/send?phone=' + phoneNumber + '&text=' + message);
+                    };
+                    buttonContainer.appendChild(whatsappButton);
+
+                    noteElement.appendChild(buttonContainer);
+
+                    noteList.appendChild(noteElement);
+                });
+            }
+        }
+
+        // Load notes from local storage when the page loads
+        window.onload = loadFromLocalStorage;
+    </script>
+</body>
+</html>
