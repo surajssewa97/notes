@@ -79,12 +79,12 @@
             <div>
                 <button onclick="selectAllNotes()">Select All</button>
                 <button onclick="copySelectedNotes()">Copy</button>
-                <button onclick="deleteSelectedNotes()">Delete</button>
-                <button onclick="shareToWhatsApp()">Share to WhatsApp</button>
             </div>
         </div>
         <textarea id="noteInput" placeholder="Enter your note here..."></textarea>
         <button onclick="saveNote()">Save Note</button>
+        <button onclick="deleteSelectedNotes()">Delete</button>
+        <button onclick="shareToWhatsApp()">Share to WhatsApp</button>
         <div id="noteList"></div>
     </div>
 
@@ -152,14 +152,13 @@
         }
 
         // Function to share note to WhatsApp
-function shareToWhatsApp() {
-    var selectedNotes = document.querySelectorAll('.note input[type="checkbox"]:checked');
-    var notesText = Array.from(selectedNotes).map(note => note.parentElement.textContent).join('\n');
-    var message = encodeURIComponent("Check out my notes:\n\n" + notesText);
-    var whatsappUrl = "https://wa.me/?text=" + message;
-    window.open(whatsappUrl, "_blank");
-}
-
+        function shareToWhatsApp() {
+            var selectedNotes = document.querySelectorAll('.note input[type="checkbox"]:checked');
+            var notesText = Array.from(selectedNotes).map(note => note.parentElement.textContent).join('\n');
+            var message = encodeURIComponent("Check out my notes:\n\n" + notesText);
+            var whatsappUrl = "https://wa.me/?text=" + message;
+            window.open(whatsappUrl, "_blank");
+        }
 
         // Function to save notes to local storage
         function saveToLocalStorage() {
