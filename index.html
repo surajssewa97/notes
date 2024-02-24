@@ -151,11 +151,15 @@
             checkboxes.forEach(checkbox => checkbox.checked = true);
         }
 
-        // Function to share to WhatsApp
-        function shareToWhatsApp() {
-            // Replace with your WhatsApp sharing logic
-            alert('Sharing to WhatsApp...');
-        }
+        // Function to share note to WhatsApp
+function shareToWhatsApp() {
+    var selectedNotes = document.querySelectorAll('.note input[type="checkbox"]:checked');
+    var notesText = Array.from(selectedNotes).map(note => note.parentElement.textContent).join('\n');
+    var message = encodeURIComponent("Check out my notes:\n\n" + notesText);
+    var whatsappUrl = "https://wa.me/?text=" + message;
+    window.open(whatsappUrl, "_blank");
+}
+
 
         // Function to save notes to local storage
         function saveToLocalStorage() {
