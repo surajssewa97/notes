@@ -21,10 +21,31 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
         h1 {
             color: #1877f2;
             font-size: 24px;
-            margin-bottom: 20px;
+            margin: 0;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #1877f2;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #166fe5;
         }
 
         textarea {
@@ -37,21 +58,6 @@
             resize: vertical;
         }
 
-        button {
-            padding: 10px 20px;
-            background-color: #1877f2;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-
-        button:hover {
-            background-color: #166fe5;
-        }
-
         .note {
             position: relative;
             margin-bottom: 10px;
@@ -61,48 +67,30 @@
             background-color: #fff;
         }
 
-        .note .button-container {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            display: flex;
-            gap: 5px;
-        }
-
-        .note button {
-            background-color: transparent;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 5px;
-        }
-
-        .copy {
-            color: #1877f2;
-        }
-
-        .delete {
-            color: #ff0000;
-        }
-
-        .delete:hover {
-            background-color: #ffcccc;
-        }
-
-        .whatsapp {
-            color: #25D366; /* WhatsApp Green */
+        .note input[type="checkbox"] {
+            margin-right: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Notes App</h1>
+        <div class="navbar">
+            <h1>Notes App</h1>
+            <div>
+                <button onclick="selectAllNotes()">Select All</button>
+                <button onclick="copySelectedNotes()">Copy</button>
+                <button onclick="deleteSelectedNotes()">Delete</button>
+                <button onclick="shareToWhatsApp()">Share to WhatsApp</button>
+            </div>
+        </div>
         <textarea id="noteInput" placeholder="Enter your note here..."></textarea>
         <button onclick="saveNote()">Save Note</button>
         <div id="noteList"></div>
     </div>
 
     <script>
+        var noteCount = 0; // Variable to track the number of notes
+
         // Function to save note
         function saveNote() {
             var noteInput = document.getElementById('noteInput');
@@ -110,46 +98,19 @@
             var noteText = noteInput.value.trim();
 
             if (noteText !== '') {
+                noteCount++; // Increment note count
                 var noteElement = document.createElement('div');
                 noteElement.classList.add('note');
-                noteElement.textContent = noteText;
-
-                // Create button container
-                var buttonContainer = document.createElement('div');
-                buttonContainer.classList.add('button-container');
                 
-                // Create copy button
-                var copyButton = document.createElement('button');
-                copyButton.innerHTML = '📋';
-                copyButton.classList.add('copy');
-                copyButton.onclick = function() {
-                    copyToClipboard(noteText);
-                };
-                buttonContainer.appendChild(copyButton);
+                // Add checkbox
+                var checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                noteElement.appendChild(checkbox);
 
-                // Create delete button
-                var deleteButton = document.createElement('button');
-                deleteButton.innerHTML = '❌';
-                deleteButton.classList.add('delete');
-                deleteButton.onclick = function() {
-                    noteList.removeChild(noteElement);
-                    saveToLocalStorage();
-                };
-                buttonContainer.appendChild(deleteButton);
-
-                // Create WhatsApp share button
-                var whatsappButton = document.createElement('button');
-                whatsappButton.innerHTML = 'WhatsApp';
-                whatsappButton.classList.add('whatsapp');
-                whatsappButton.onclick = function() {
-                    // Change the phone number and message content as needed
-                    var phoneNumber = ''; // Enter phone number here
-                    var message = encodeURIComponent(noteText);
-                    window.open('https://api.whatsapp.com/send?phone=' + phoneNumber + '&text=' + message);
-                };
-                buttonContainer.appendChild(whatsappButton);
-
-                noteElement.appendChild(buttonContainer);
+                // Display note text
+                var noteContent = document.createElement('span');
+                noteContent.textContent = noteText;
+                noteElement.appendChild(noteContent);
 
                 noteList.appendChild(noteElement);
                 noteInput.value = '';
@@ -170,6 +131,32 @@
             alert('Note copied to clipboard!');
         }
 
+        // Function to copy selected notes to clipboard
+        function copySelectedNotes() {
+            var selectedNotes = document.querySelectorAll('.note input[type="checkbox"]:checked');
+            var notesText = Array.from(selectedNotes).map(note => note.parentElement.textContent).join('\n');
+            copyToClipboard(notesText);
+        }
+
+        // Function to delete selected notes
+        function deleteSelectedNotes() {
+            var selectedNotes = document.querySelectorAll('.note input[type="checkbox"]:checked');
+            selectedNotes.forEach(note => note.parentElement.remove());
+            saveToLocalStorage();
+        }
+
+        // Function to select all notes
+        function selectAllNotes() {
+            var checkboxes = document.querySelectorAll('.note input[type="checkbox"]');
+            checkboxes.forEach(checkbox => checkbox.checked = true);
+        }
+
+        // Function to share to WhatsApp
+        function shareToWhatsApp() {
+            // Replace with your WhatsApp sharing logic
+            alert('Sharing to WhatsApp...');
+        }
+
         // Function to save notes to local storage
         function saveToLocalStorage() {
             var notes = document.querySelectorAll('.note');
@@ -185,44 +172,16 @@
                 notesArray.forEach(noteText => {
                     var noteElement = document.createElement('div');
                     noteElement.classList.add('note');
-                    noteElement.textContent = noteText;
 
-                    // Create button container
-                    var buttonContainer = document.createElement('div');
-                    buttonContainer.classList.add('button-container');
-                    
-                    // Create copy button
-                    var copyButton = document.createElement('button');
-                    copyButton.innerHTML = '📋';
-                    copyButton.classList.add('copy');
-                    copyButton.onclick = function() {
-                        copyToClipboard(noteText);
-                    };
-                    buttonContainer.appendChild(copyButton);
+                    // Add checkbox
+                    var checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    noteElement.appendChild(checkbox);
 
-                    // Create delete button
-                    var deleteButton = document.createElement('button');
-                    deleteButton.innerHTML = '❌';
-                    deleteButton.classList.add('delete');
-                    deleteButton.onclick = function() {
-                        noteList.removeChild(noteElement);
-                        saveToLocalStorage();
-                    };
-                    buttonContainer.appendChild(deleteButton);
-
-                    // Create WhatsApp share button
-                    var whatsappButton = document.createElement('button');
-                    whatsappButton.innerHTML = 'WhatsApp';
-                    whatsappButton.classList.add('whatsapp');
-                    whatsappButton.onclick = function() {
-                        // Change the phone number and message content as needed
-                        var phoneNumber = ''; // Enter phone number here
-                        var message = encodeURIComponent(noteText);
-                        window.open('https://api.whatsapp.com/send?phone=' + phoneNumber + '&text=' + message);
-                    };
-                    buttonContainer.appendChild(whatsappButton);
-
-                    noteElement.appendChild(buttonContainer);
+                    // Display note text
+                    var noteContent = document.createElement('span');
+                    noteContent.textContent = noteText;
+                    noteElement.appendChild(noteContent);
 
                     noteList.appendChild(noteElement);
                 });
